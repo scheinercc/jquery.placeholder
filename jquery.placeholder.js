@@ -27,37 +27,45 @@
 				// remove placeholder value on focus
 				.on( 'focus', function() {
 
-					var input = $(this),
-						placeHolderText = input.attr('placeholder');
+					var $input = $(this),
+						placeHolderText = $input.attr('placeholder');
 
-					if ( input.val() === placeHolderText ) {
+					if ( $input.val() === placeHolderText ) {
 
-						input.val('');
-						input.removeClass('placeholder');
+						$input
+							.val('')
+							.removeClass('placeholder');
 					}
 				})
 				// add placeholder text on blur if no individual value is set
 				.on( 'blur', function() {
 
-					var input = $(this),
-						placeHolderText = input.attr('placeholder');
+					var $input = $(this),
+						placeHolderText = $input.attr('placeholder');
 
-					if ( input.val() === '' || input.val() === placeHolderText ) {
+					if ( $input.val() === '' ) {
 
-						input.addClass('placeholder');
-						input.val(placeHolderText);
+						$input
+							.addClass('placeholder')
+							.val(placeHolderText);
 					}
 				})
 				// initiate placeholder text
 				.blur();
 
-			// remove placeholder text on submit
+			// form submit
 			$elems
 				.parents('form')
-				.submit( function() {
+				.find(opts.submitHandler)
+				.on( 'click', function( evt ) {
 
-					$(this)
-						.find('[placeholder]')
+					evt.preventDefault();
+
+					var $this = $(this),
+						$placeholderElems = $this.parents('form').find('[placeholder]');
+
+					// remove placeholder text
+					$placeholderElems
 						.each( function() {
 
 							var input = $(this),
@@ -67,6 +75,23 @@
 								input.val('');
 							}
 						});
+
+					// add placeholder text back
+					setTimeout( function() {
+						$placeholderElems
+							.each( function() {
+
+								var input = $(this),
+									placeHolderText = input.attr('placeholder');
+
+								if ( input.val() === '' || input.val() === placeHolderText ) {
+
+									input
+										.val(placeHolderText)
+										.addClass('placeholder');
+								}
+							});
+					}, 10);
 				});
 		}
 
@@ -79,6 +104,7 @@
 
 	// Plugin defaults – added as a property on the plugin function.
 	$.fn.placeholder.defaults = {
+		submitHandler: '.js-form-submit',
 		complete: function() {}
 	};
 
